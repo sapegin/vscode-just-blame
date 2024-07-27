@@ -58,16 +58,16 @@ Here’s how a config file would look like with default options:
       "#fcfdfd"
     ],
     "dark": [
-      "#8364b9",
-      "#7b5ab5",
-      "#734fb0",
-      "#6c4aa5",
       "#65469b",
       "#5e4190",
       "#573c86",
       "#50377b",
       "#493371",
-      "#422e66"
+      "#422e66",
+      "#3d2b5f",
+      "#362654",
+      "#2f214a",
+      "#291c3f"
     ]
   },
   "locale": "en-GB"
