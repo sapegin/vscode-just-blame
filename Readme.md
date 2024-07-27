@@ -4,9 +4,15 @@ Git Blame annotations, inspired by JetBrains editors.
 
 **[Install from Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=sapegin.just-blame)**
 
+With light theme:
+
 ![Just Blame with light theme](screenshots/screenshot.png)
 
+With dark theme:
+
 ![Just Blame with dark theme](screenshots/screenshot-dark.png)
+
+Commit information tooltip:
 
 ![Commit information tooltip](screenshots/tooltip.png)
 
