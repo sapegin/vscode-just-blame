@@ -21,6 +21,7 @@ Commit information tooltip:
 - Very minimal and fast.
 - Heatmap like in JetBrains editors.
 - Supports light and dark modes out of the box, and doesn’t come with insanely bright colors by default.
+- Doesn’t use any resources until you turn on the annotations.
 - Doesn’t pollute the editor with too many commands and hotkeys.
 
 ## Commands
