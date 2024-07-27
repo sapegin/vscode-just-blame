@@ -1,0 +1,146 @@
+{
+  "name": "just-blame",
+  "displayName": "Just Blame",
+  "publisher": "sapegin",
+  "author": {
+    "name": "Artem Sapegin"
+  },
+  "description": "Git Blame annotations, inspired by JetBrains editors",
+  "icon": "images/icon.png",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "galleryBanner": {
+    "color": "#ece3fc",
+    "theme": "light"
+  },
+  "keywords": [
+    "git",
+    "git blame",
+    "blame",
+    "changes",
+    "log",
+    "author",
+    "history",
+    "source control"
+  ],
+  "homepage": "https://github.com/sapegin/vscode-just-blame",
+  "bugs": {
+    "url": "https://github.com/sapegin/vscode-just-blame/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sapegin/vscode-just-blame"
+  },
+  "sponsor": {
+    "url": "https://www.buymeacoffee.com/sapegin"
+  },
+  "license": "MIT",
+  "main": "out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "justBlame.toggleBlame",
+        "title": "Just Blame: Toggle Git blame annotations",
+        "enablement": "editorIsOpen && workbench.scm.active"
+      }
+    ],
+    "configuration": {
+      "title": "Just Blame",
+      "properties": {
+        "justBlame.colorScale": {
+          "description": "Colors to show age of blame entries",
+          "type": "object",
+          "properties": {
+            "light": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^#[a-fA-F0-9]{6,8}$"
+              }
+            },
+            "dark": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^#[a-fA-F0-9]{6,8}$"
+              }
+            }
+          },
+          "default": {
+            "light": [
+              "#a4bed0",
+              "#aec5d5",
+              "#b8ccdb",
+              "#c2d4e0",
+              "#cddbe5",
+              "#d7e2ea",
+              "#e1e9ef",
+              "#ebf1f5",
+              "#f5f8fa",
+              "#fcfdfd"
+            ],
+            "dark": [
+              "#65469b",
+              "#5e4190",
+              "#573c86",
+              "#50377b",
+              "#493371",
+              "#422e66",
+              "#3d2b5f",
+              "#362654",
+              "#2f214a",
+              "#291c3f"
+            ]
+          }
+        },
+        "justBlame.locale": {
+          "description": "Locale to format dates",
+          "type": "string",
+          "default": "en-GB"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "rm -rf out && npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "watch": "npm run esbuild-watch",
+    "lint": "eslint . --cache --fix",
+    "format": "prettier --log-level warn --write \"**/*.{js,ts,tsx,md}\"",
+    "pretest": "npm run lint",
+    "test": "npm run esbuild-base && tsc --noEmit",
+    "posttest": "npm run format",
+    "publish": "vsce publish",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/lodash": "^4.17.7",
+    "@types/node": "^20.14.12",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^2.31.1",
+    "esbuild": "^0.23.0",
+    "eslint": "^9.7.0",
+    "eslint-config-tamia": "^9.1.6",
+    "glob": "^11.0.0",
+    "husky": "^9.1.2",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,md}": "prettier --write",
+    "*.{js,ts,tsx}": "eslint --cache --fix"
+  },
+  "dependencies": {
+    "git-remote-origin-url": "^4.0.0",
+    "lodash": "^4.17.21"
+  }
+}

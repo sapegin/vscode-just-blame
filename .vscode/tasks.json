@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "watch",
+      "problemMatcher": {
+        "base": "$tsc-watch",
+        "background": {
+          "beginsPattern": {
+            "regexp": "[watch]"
+          },
+          "endsPattern": {
+            "regexp": "build finished"
+          }
+        }
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

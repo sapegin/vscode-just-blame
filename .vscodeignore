@@ -1,0 +1,10 @@
+.*
+.*/**
+out/test/**
+out/**/*.map
+src/**
+screenshots/**
+samples/**
+Contributing.md
+tsconfig.json
+prettier.config.cjs
