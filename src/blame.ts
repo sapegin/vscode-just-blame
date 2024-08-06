@@ -78,7 +78,7 @@ function parseBlameResults(results: string) {
     const header = /^([\da-f]{40})\s(\d+)\s(\d+)\s?(\d+)?$/.exec(lines[index]);
 
     if (header === null) {
-      logMessage('Skip parsing line', lines[index]);
+      logMessage('Skip parsing line', index, lines[index]);
       window.showErrorMessage('Git blame parsing failed.');
       continue;
     }
@@ -105,8 +105,14 @@ function parseBlameResults(results: string) {
       index++;
 
       // Parse info rows
-      let info;
-      while ((info = lines[index].match(/^([a-z-]+)\s(.+)$/))) {
+      // Info rows are either `some-name Value` or `boundary`
+      // The last info row is always `filename`
+      for (;;) {
+        const info = lines[index].match(/^([a-z-]+)\s*(.+)?$/);
+        if (info === null) {
+          break;
+        }
+
         const [, key, value] = info;
         switch (key) {
           case 'author': {
@@ -132,7 +138,12 @@ function parseBlameResults(results: string) {
             break;
           }
         }
+
         index++;
+
+        if (key === 'filename') {
+          break;
+        }
       }
     }
 
