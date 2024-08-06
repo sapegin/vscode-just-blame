@@ -45,7 +45,7 @@ Here’s how a config file would look like with default options:
 
 ```json
 {
-  "todoTomorrow.colorScale": {
+  "justBlame.colorScale": {
     "light": [
       "#a4bed0",
       "#aec5d5",
