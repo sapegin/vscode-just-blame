@@ -16,14 +16,28 @@ export function activate(context: ExtensionContext) {
 
   let { activeTextEditor } = window;
 
-  const blame = new BlameManager(getExtensionProperties());
+  const blames = new Map<string, BlameManager>();
 
   context.subscriptions.push(
+    // Toggle blame
     commands.registerTextEditorCommand('justBlame.toggleBlame', (editor) => {
-      blame.toggleBlame(editor);
+      const { fileName } = editor.document;
+
+      if (blames.has(fileName) === false) {
+        logMessage('Create new blame instance for', fileName);
+        const config = getExtensionProperties();
+        logMessage('Config: ', config);
+        const blame = new BlameManager(config);
+        blame.open(editor);
+        blames.set(fileName, blame);
+      } else {
+        logMessage('Destroy blame instance for', fileName);
+        blames.get(fileName)?.close(editor);
+        blames.delete(fileName);
+      }
     }),
 
-    // Close on text change
+    // Close on text change: we cannot show correct blame on unsaved files
     workspace.onDidChangeTextDocument(({ document, contentChanges }) => {
       if (
         // Ignore changes that didn't affect text content
@@ -36,21 +50,25 @@ export function activate(context: ExtensionContext) {
         return;
       }
 
-      blame.closeBlame(activeTextEditor);
+      const { fileName } = activeTextEditor.document;
+      blames.get(fileName)?.close(activeTextEditor);
+      blames.delete(fileName);
     }),
 
-    // Close on document change
+    // Update on document change
     window.onDidChangeActiveTextEditor((editor) => {
-      // Ignore switch to log panel and back
-      if (
-        editor === activeTextEditor ||
-        editor?.document.languageId === 'Log'
-      ) {
+      if (editor === undefined) {
         return;
       }
-      if (activeTextEditor) {
-        blame.closeBlame(activeTextEditor);
+
+      const { fileName } = editor.document;
+
+      if (blames.has(fileName)) {
+        // Update the blame for the current editor
+        logMessage('Refresh the blame for', fileName);
+        blames.get(fileName)?.open(editor);
       }
+
       activeTextEditor = editor;
     }),
   );

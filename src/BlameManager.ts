@@ -34,15 +34,12 @@ const UNCOMMITTED_AUTHOR = 'Not Committed Yet';
 const UNCOMMITTED_LABEL = 'Not committed';
 
 export class BlameManager {
-  private isOpen = false;
   private config: ExtensionProperties;
   private blameResults: BlameEntry[] = [];
   private colorMap: Record<string, string> = {};
   private decorationType: TextEditorDecorationType;
 
   public constructor(config: ExtensionProperties) {
-    logMessage('Config: ', config);
-
     this.config = config;
     this.decorationType = window.createTextEditorDecorationType({
       before: {
@@ -53,15 +50,7 @@ export class BlameManager {
     });
   }
 
-  public async toggleBlame(editor: TextEditor) {
-    logMessage('Toggle blame for', editor.document.fileName, this.isOpen);
-
-    if (this.isOpen) {
-      this.closeBlame(editor);
-      this.isOpen = false;
-      return;
-    }
-
+  public async open(editor: TextEditor) {
     const workspaceRoot = this.getWorkspaceRoot(editor);
     if (workspaceRoot === undefined) {
       window.showErrorMessage('Workspace is required to use Just Blame');
@@ -75,7 +64,7 @@ export class BlameManager {
 
     if (isEmpty(this.blameResults)) {
       logMessage('Empty blame');
-      // No results (possibly an error): don't do, pretend the blame was never opened
+      // No results (possibly an error): do nothing, pretend the blame was never opened
       return;
     }
 
@@ -87,21 +76,11 @@ export class BlameManager {
 
     const decorations = this.getBlamedDecorations(editor.document, repoUrl);
     editor.setDecorations(this.decorationType, decorations);
-
-    workspace.onDidChangeTextDocument(() => {
-      if (this.isOpen) {
-        editor.setDecorations(this.decorationType, decorations);
-      }
-    });
-
-    this.isOpen = true;
   }
 
-  public closeBlame(editor: TextEditor) {
-    logMessage('Close blame');
+  public close(editor: TextEditor) {
     // Remove all decorations
     editor.setDecorations(this.decorationType, []);
-    this.isOpen = false;
   }
 
   private indexColors(blameResults: BlameEntry[]) {
