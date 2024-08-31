@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.2
+## 2.0.3
 
 - Keep the blame open on switch to another document and back.
 - Prevent opening (incorrect) blame when the file has unsaved changes.
