@@ -54,7 +54,12 @@ export class BlameManager {
     const workspaceRoot = this.getWorkspaceRoot(editor);
     if (workspaceRoot === undefined) {
       window.showErrorMessage('Workspace is required to use Just Blame');
-      return;
+      return false;
+    }
+
+    if (editor.document.isDirty) {
+      window.showInformationMessage('Save the file before opening Just Blame');
+      return false;
     }
 
     logMessage('Workspace root:', workspaceRoot);
@@ -63,9 +68,11 @@ export class BlameManager {
     this.blameResults = await getBlameInfo(workspaceRoot, relativePath);
 
     if (isEmpty(this.blameResults)) {
-      logMessage('Empty blame');
-      // No results (possibly an error): do nothing, pretend the blame was never opened
-      return;
+      // No results (possibly an error)
+      window.showErrorMessage(
+        'Cannot open Just Blame: `git blame` returned nothing',
+      );
+      return false;
     }
 
     this.indexColors(this.blameResults);
@@ -76,6 +83,8 @@ export class BlameManager {
 
     const decorations = this.getBlamedDecorations(editor.document, repoUrl);
     editor.setDecorations(this.decorationType, decorations);
+
+    return true;
   }
 
   public close(editor: TextEditor) {

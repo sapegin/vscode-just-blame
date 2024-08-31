@@ -20,22 +20,27 @@ export function activate(context: ExtensionContext) {
 
   context.subscriptions.push(
     // Toggle blame
-    commands.registerTextEditorCommand('justBlame.toggleBlame', (editor) => {
-      const { fileName } = editor.document;
+    commands.registerTextEditorCommand(
+      'justBlame.toggleBlame',
+      async (editor) => {
+        const { fileName } = editor.document;
 
-      if (blames.has(fileName) === false) {
-        logMessage('Create new blame instance for', fileName);
-        const config = getExtensionProperties();
-        logMessage('Config: ', config);
-        const blame = new BlameManager(config);
-        blame.open(editor);
-        blames.set(fileName, blame);
-      } else {
-        logMessage('Destroy blame instance for', fileName);
-        blames.get(fileName)?.close(editor);
-        blames.delete(fileName);
-      }
-    }),
+        if (blames.has(fileName) === false) {
+          logMessage('Create new blame instance for', fileName);
+          const config = getExtensionProperties();
+          logMessage('Config: ', config);
+          const blame = new BlameManager(config);
+          const isOpen = await blame.open(editor);
+          if (isOpen) {
+            blames.set(fileName, blame);
+          }
+        } else {
+          logMessage('Destroy blame instance for', fileName);
+          blames.get(fileName)?.close(editor);
+          blames.delete(fileName);
+        }
+      },
+    ),
 
     // Close on text change: we cannot show correct blame on unsaved files
     workspace.onDidChangeTextDocument(({ document, contentChanges }) => {
