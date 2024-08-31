@@ -4,6 +4,7 @@
 
 - Keep the blame open on switch to another document and back.
 - Prevent opening (incorrect) blame when the file has unsaved changes.
+- Remove unnecessary files from the package.
 
 ## 2.0.1
 
