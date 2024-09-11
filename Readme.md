@@ -1,6 +1,6 @@
 # Just Blame 🪲
 
-Git Blame annotations, inspired by JetBrains editors.
+Git Blame annotations sidebar, inspired by JetBrains editors.
 
 **[Install from Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=sapegin.just-blame)**
 
@@ -38,8 +38,8 @@ You can change the following options in the [Visual Studio Code setting](https:/
 
 | Description | Setting | Default |
 | --- | --- | --- |
-| Colors to show age of blame entries | `justBlame.colorScale` | See below |
-| Locale to format dates | `justBlame.locale` | `en-GB` |
+| Colors to show age of blame entries | [justBlame.colorScale](vscode://settings/justBlame.colorScale) | See below |
+| Locale to format dates | [justBlame.locale](vscode://settings/justBlame.locale) | `en-GB` |
 
 Here’s how a config file would look like with default options:
 

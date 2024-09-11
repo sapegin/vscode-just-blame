@@ -1,11 +1,11 @@
 {
   "name": "just-blame",
-  "displayName": "Just Blame",
+  "displayName": "Just Blame: Git Blame annotations",
   "publisher": "sapegin",
   "author": {
     "name": "Artem Sapegin"
   },
-  "description": "Git Blame annotations, inspired by JetBrains editors",
+  "description": "Git Blame annotations sidebar, inspired by JetBrains editors",
   "icon": "images/icon.png",
   "version": "2.0.3",
   "engines": {
@@ -26,7 +26,9 @@
     "log",
     "author",
     "history",
-    "source control"
+    "source control",
+    "sidebar",
+    "annotations"
   ],
   "homepage": "https://github.com/sapegin/vscode-just-blame",
   "bugs": {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.4
+
+- Update readme and metadata.
+
 ## 2.0.3
 
 - Keep the blame open on switch to another document and back.
