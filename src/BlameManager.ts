@@ -142,11 +142,15 @@ export class BlameManager {
         timeZone,
       }).format(date);
     } catch (error) {
+      // Sometimes, the date formatting fails with the
+      // `Invalid time zone specified` error:
+      // https://github.com/sapegin/vscode-just-blame/issues/2
       if (error instanceof Error) {
         logMessage('Error formatting date:', error.message);
         logMessage('Timestamp:', date);
         logMessage('Time zone:', timeZone);
       }
+      // Return the date in the ISO format as a fallback
       return date.toISOString();
     }
   }
