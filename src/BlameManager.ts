@@ -133,23 +133,34 @@ export class BlameManager {
   /**
    * Monday, 17 June 2024 at 14:04:31 GMT+2
    */
-  private formatDateLong(date: number, timeZone: string) {
-    return new Intl.DateTimeFormat(this.config.locale, {
-      dateStyle: 'full',
-      timeStyle: 'long',
-      timeZone,
-    }).format(new Date(date));
+  private formatDateLong(timestamp: number, timeZone: string) {
+    const date = new Date(timestamp);
+    try {
+      return new Intl.DateTimeFormat(this.config.locale, {
+        dateStyle: 'full',
+        timeStyle: 'long',
+        timeZone,
+      }).format(date);
+    } catch (error) {
+      if (error instanceof Error) {
+        logMessage('Error formatting date:', error.message);
+        logMessage('Timestamp:', date);
+        logMessage('Time zone:', timeZone);
+      }
+      return date.toISOString();
+    }
   }
 
   /**
    * 30.05.99
    */
-  private formatDateShort(date: number) {
+  private formatDateShort(timestamp: number) {
+    const date = new Date(timestamp);
     return new Intl.DateTimeFormat(this.config.locale, {
       day: '2-digit',
       month: '2-digit',
       year: '2-digit',
-    }).format(new Date(date));
+    }).format(date);
   }
 
   private getColorScale() {
