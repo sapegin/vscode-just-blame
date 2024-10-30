@@ -4,6 +4,8 @@ Git Blame annotations sidebar, inspired by JetBrains editors.
 
 **[Install from Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=sapegin.just-blame)**
 
+[![Washing your code. A book on clean code for frontend developers](https://sapegin.me/images/washing-code-github.jpg)](https://sapegin.me/book/)
+
 With light theme:
 
 ![Just Blame with light theme](screenshots/screenshot.png)
