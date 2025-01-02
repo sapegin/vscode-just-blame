@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.6
+
+- Update readme.
+
 ## 2.0.5
 
 - Wrap date formatting in try/catch to avoid crashing the extension, and log debug info.
