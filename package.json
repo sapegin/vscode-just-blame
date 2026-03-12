@@ -51,6 +51,15 @@
         "enablement": "editorIsOpen && workbench.scm.active"
       }
     ],
+    "menus": {
+      "editor/lineNumber/context": [
+        {
+          "command": "justBlame.toggleBlame",
+          "group": "navigation@50",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
     "configuration": {
       "title": "Just Blame",
       "properties": {
