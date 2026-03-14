@@ -1,6 +1,4 @@
 import path from 'node:path';
-import maxBy from 'lodash/maxBy';
-import uniq from 'lodash/uniq';
 import gitRemoteOriginUrl from 'git-remote-origin-url';
 import { getBlameInfo, getGitRoot, type BlameEntry } from './blame';
 import { logMessage } from './debug';
@@ -19,6 +17,19 @@ import {
   type ThemableDecorationAttachmentRenderOptions,
 } from 'vscode';
 import type { ExtensionProperties } from './types';
+
+function maxBy<T>(items: T[], fn: (item: T) => number): T | undefined {
+  let maxItem: T | undefined;
+  let maxValue = -Infinity;
+  for (const item of items) {
+    const value = fn(item);
+    if (value > maxValue) {
+      maxValue = value;
+      maxItem = item;
+    }
+  }
+  return maxItem;
+}
 
 /** Color to use for entries that are older than the last available color in the scale */
 const NO_COLOR = '#fff0';
@@ -99,7 +110,7 @@ export class BlameManager {
   private indexColors(blameResults: BlameEntry[]) {
     const colorScale = this.getColorScale();
     const allDates = blameResults.map((x) => x.date);
-    const distinctDates = uniq(allDates);
+    const distinctDates = [...new Set(allDates)];
     const sortedDistinctDates = distinctDates.toSorted((a, b) => b - a);
     this.colorMap = sortedDistinctDates.reduce<Record<string, string>>(
       (accumulator, date, index) => {

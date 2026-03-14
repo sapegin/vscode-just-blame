@@ -4,6 +4,7 @@
 
 - Add a menu item to the line number context menu.
 - Resolve Git repo root instead of using workspace folder.
+- Drop Lodash dependency.
 
 ## 2.0.6
 
