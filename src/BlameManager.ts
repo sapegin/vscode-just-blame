@@ -1,8 +1,9 @@
+import path from 'node:path';
 import isEmpty from 'lodash/isEmpty';
 import maxBy from 'lodash/maxBy';
 import uniq from 'lodash/uniq';
 import gitRemoteOriginUrl from 'git-remote-origin-url';
-import { getBlameInfo, type BlameEntry } from './blame';
+import { getBlameInfo, getGitRoot, type BlameEntry } from './blame';
 import { logMessage } from './debug';
 import {
   ColorThemeKind,
@@ -62,10 +63,14 @@ export class BlameManager {
       return false;
     }
 
+    const filePath = editor.document.uri.fsPath;
+    const gitRoot = await getGitRoot(filePath, workspaceRoot);
+    const relativePath = path.relative(gitRoot, filePath);
+
+    logMessage('Git root:', gitRoot);
     logMessage('Workspace root:', workspaceRoot);
 
-    const relativePath = workspace.asRelativePath(editor.document.uri);
-    this.blameResults = await getBlameInfo(workspaceRoot, relativePath);
+    this.blameResults = await getBlameInfo(gitRoot, relativePath);
 
     if (isEmpty(this.blameResults)) {
       // No results (possibly an error)
@@ -77,7 +82,7 @@ export class BlameManager {
 
     this.indexColors(this.blameResults);
 
-    const repoUrl = await this.getRepositoryUrl(workspaceRoot);
+    const repoUrl = await this.getRepositoryUrl(gitRoot);
 
     logMessage('GitHub URL', repoUrl);
 

@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { window } from 'vscode';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -154,13 +155,31 @@ function parseBlameResults(results: string) {
   return Object.values(entries);
 }
 
+/**
+ * Resolve the git repository root for a given file path.
+ * Falls back to the provided workspaceRoot when git is unavailable.
+ */
+export async function getGitRoot(
+  filePath: string,
+  fallback: string,
+): Promise<string> {
+  try {
+    const { stdout } = await promiseExec('git rev-parse --show-toplevel', {
+      cwd: path.dirname(filePath),
+    });
+    return stdout.trim();
+  } catch {
+    return fallback;
+  }
+}
+
 export async function getBlameInfo(
-  workspaceRoot: string,
+  gitRoot: string,
   relativePath: string,
 ): Promise<BlameEntry[]> {
   logMessage('Relative path:', relativePath);
 
-  const results = await execGitBlame(workspaceRoot, relativePath);
+  const results = await execGitBlame(gitRoot, relativePath);
 
   const parsedResults = parseBlameResults(results);
 
