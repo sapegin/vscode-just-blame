@@ -1,5 +1,4 @@
 import path from 'node:path';
-import isEmpty from 'lodash/isEmpty';
 import maxBy from 'lodash/maxBy';
 import uniq from 'lodash/uniq';
 import gitRemoteOriginUrl from 'git-remote-origin-url';
@@ -72,7 +71,7 @@ export class BlameManager {
 
     this.blameResults = await getBlameInfo(gitRoot, relativePath);
 
-    if (isEmpty(this.blameResults)) {
+    if (this.blameResults.length === 0) {
       // No results (possibly an error)
       window.showErrorMessage(
         'Cannot open Just Blame: `git blame` returned nothing',
