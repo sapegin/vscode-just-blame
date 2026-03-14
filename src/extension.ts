@@ -1,13 +1,16 @@
-import { commands, window, workspace, type ExtensionContext } from 'vscode';
-import { logMessage } from './debug';
+import { commands, type ExtensionContext, window, workspace } from 'vscode';
 import { BlameManager } from './BlameManager';
+import { logMessage } from './debug';
 import type { ExtensionProperties } from './types';
 
 function getExtensionProperties(): ExtensionProperties {
-  const { colorScale, locale } = workspace.getConfiguration('justBlame');
+  const config = workspace.getConfiguration('justBlame');
   return {
-    colorScale,
-    locale,
+    colorScale: config.get<ExtensionProperties['colorScale']>('colorScale', {
+      light: [],
+      dark: [],
+    }),
+    locale: config.get<string>('locale', 'en'),
   };
 }
 
@@ -20,9 +23,8 @@ export function activate(context: ExtensionContext) {
 
   context.subscriptions.push(
     // Toggle blame
-    commands.registerTextEditorCommand(
-      'justBlame.toggleBlame',
-      async (editor) => {
+    commands.registerTextEditorCommand('justBlame.toggleBlame', (editor) => {
+      void (async () => {
         const { fileName } = editor.document;
 
         if (blames.has(fileName) === false) {
@@ -39,8 +41,8 @@ export function activate(context: ExtensionContext) {
           blames.get(fileName)?.close(editor);
           blames.delete(fileName);
         }
-      },
-    ),
+      })();
+    }),
 
     // Close on text change: we cannot show correct blame on unsaved files
     workspace.onDidChangeTextDocument(({ document, contentChanges }) => {
@@ -61,7 +63,7 @@ export function activate(context: ExtensionContext) {
     }),
 
     // Update on document change
-    window.onDidChangeActiveTextEditor((editor) => {
+    window.onDidChangeActiveTextEditor(async (editor) => {
       if (editor === undefined) {
         return;
       }
@@ -71,7 +73,7 @@ export function activate(context: ExtensionContext) {
       if (blames.has(fileName)) {
         // Update the blame for the current editor
         logMessage('Refresh the blame for', fileName);
-        blames.get(fileName)?.open(editor);
+        await blames.get(fileName)?.open(editor);
       }
 
       activeTextEditor = editor;

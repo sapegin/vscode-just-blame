@@ -1,7 +1,7 @@
-import path from 'node:path';
-import { window } from 'vscode';
 import { exec } from 'node:child_process';
+import path from 'node:path';
 import { promisify } from 'node:util';
+import { window } from 'vscode';
 import { logMessage } from './debug';
 
 export const promiseExec = promisify(exec);
@@ -40,7 +40,7 @@ async function execGitBlame(workspaceRoot: string, relativePath: string) {
           'Git not found. Make sure Git is installed and available in the PATH',
         );
       } else {
-        window.showErrorMessage(error.message ?? 'Something went wrong');
+        window.showErrorMessage(error.message);
       }
     }
   }
@@ -48,20 +48,19 @@ async function execGitBlame(workspaceRoot: string, relativePath: string) {
 }
 
 /**
- * Create a new entry if needed
+ * Create a new entry if needed, returns the existing or new entry.
  */
 function ensureEntry(entries: BlameResults, hash: string) {
-  if (entries[hash] === undefined) {
-    entries[hash] = {
-      hash,
-      lines: [],
-      author: '',
-      email: '',
-      date: 0,
-      timeZone: '',
-      summary: '',
-    };
-  }
+  entries[hash] ??= {
+    hash,
+    lines: [],
+    author: '',
+    email: '',
+    date: 0,
+    timeZone: '',
+    summary: '',
+  };
+  return entries[hash];
 }
 
 /**
@@ -73,34 +72,39 @@ function parseBlameResults(results: string) {
   const entries: BlameResults = {};
 
   for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    if (line === undefined) {
+      continue;
+    }
+
     // Each blame entry always starts with a line of:
     // <40-byte hex sha1> <source line> <result line> [number of lines]
     // Example: 49790775624c422f67057f7bb936f35df920e391 94 120 3
-    const header = /^([\da-f]{40})\s(\d+)\s(\d+)\s?(\d+)?$/.exec(lines[index]);
+    const header = /^([\da-f]{40})\s(\d+)\s(\d+)\s?(\d+)?$/.exec(line);
 
     if (header === null) {
-      logMessage('Skip parsing line', index, lines[index]);
+      logMessage('Skip parsing line', index, line);
       window.showErrorMessage('Git blame parsing failed.');
       continue;
     }
 
     const [, hash /* sourceLine */, , resultLine] = header;
+    if (hash === undefined || resultLine === undefined) {
+      continue;
+    }
+
+    // Create a new entry if needed
+    const entry = ensureEntry(entries, hash);
 
     // This is just a line info, not a big info block
     if (
       lines[index + 2] === undefined ||
-      /^([\da-f]{40})/.test(lines[index + 2])
+      /^([\da-f]{40})/.test(lines[index + 2] ?? '')
     ) {
-      // Create a new entry if needed
-      ensureEntry(entries, hash);
-
       // Skip the line with code
       index++;
     } else {
       // We got the the block of commit info
-
-      // Create a new entry if needed
-      ensureEntry(entries, hash);
 
       // Advance to the info block
       index++;
@@ -108,48 +112,43 @@ function parseBlameResults(results: string) {
       // Parse info rows
       // Info rows are either `some-name Value` or `boundary`
       // The last info row is always `filename`
-      for (;;) {
-        const info = lines[index].match(/^([a-z-]+)\s*(.+)?$/);
-        if (info === null) {
+      let info;
+      while ((info = lines[index]?.match(/^([a-z-]+)\s(.+)$/))) {
+        const [, key, value] = info;
+        if (value === undefined) {
           break;
         }
 
-        const [, key, value] = info;
         switch (key) {
           case 'author': {
-            entries[hash].author = value;
+            entry.author = value;
             break;
           }
           case 'author-mail': {
             // Remove <...> from email
-            entries[hash].email = value.slice(1, -1);
+            entry.email = value.slice(1, -1);
             break;
           }
           case 'author-time': {
             // Convert timestamp from seconds to milliseconds
-            entries[hash].date = Number.parseInt(value) * 1000;
+            entry.date = Number.parseInt(value) * 1000;
             break;
           }
           case 'author-tz': {
-            entries[hash].timeZone = value;
+            entry.timeZone = value;
             break;
           }
           case 'summary': {
-            entries[hash].summary = value;
+            entry.summary = value;
             break;
           }
         }
-
         index++;
-
-        if (key === 'filename') {
-          break;
-        }
       }
     }
 
     // Add line number to the entry
-    entries[hash].lines.push(Number.parseInt(resultLine));
+    entry.lines.push(Number.parseInt(resultLine));
   }
 
   return Object.values(entries);

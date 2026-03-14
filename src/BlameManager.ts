@@ -1,21 +1,21 @@
 import path from 'node:path';
 import gitRemoteOriginUrl from 'git-remote-origin-url';
-import { getBlameInfo, getGitRoot, type BlameEntry } from './blame';
-import { logMessage } from './debug';
 import {
   ColorThemeKind,
+  type DecorationOptions,
   MarkdownString,
   Position,
   Range,
-  ThemeColor,
-  window,
-  workspace,
-  type DecorationOptions,
   type TextDocument,
   type TextEditor,
   type TextEditorDecorationType,
   type ThemableDecorationAttachmentRenderOptions,
+  ThemeColor,
+  window,
+  workspace,
 } from 'vscode';
+import { type BlameEntry, getBlameInfo, getGitRoot } from './blame';
+import { logMessage } from './debug';
 import type { ExtensionProperties } from './types';
 
 function maxBy<T>(items: T[], fn: (item: T) => number): T | undefined {
@@ -35,7 +35,7 @@ function maxBy<T>(items: T[], fn: (item: T) => number): T | undefined {
 const NO_COLOR = '#fff0';
 
 /** Non-breaking space: has the correct width but doesn’t get squished like a regular space */
-const NBSP = '\u00A0';
+const NBSP = '\u00a0';
 /** Narrower space */
 const THIN_SPACE = '\u2009';
 
@@ -115,7 +115,7 @@ export class BlameManager {
     this.colorMap = sortedDistinctDates.reduce<Record<string, string>>(
       (accumulator, date, index) => {
         if (index < colorScale.length) {
-          accumulator[date] = colorScale[index];
+          accumulator[date] = colorScale[index] ?? '';
         }
         return accumulator;
       },
@@ -228,8 +228,6 @@ ${summary}
   private getBlamedDecorations(document: TextDocument, repoUrl: string) {
     const decorations: DecorationOptions[] = [];
 
-    const lineCount = document.lineCount ?? 0;
-
     // Longest author lengths to align columns
     const maxAuthorLength = Math.max(
       ...this.blameResults.map((line) => line.author.length),
@@ -240,7 +238,7 @@ ${summary}
       x.author === UNCOMMITTED_AUTHOR ? 0 : x.date,
     )?.hash;
 
-    for (let index = 1; index < lineCount; index++) {
+    for (let index = 1; index < document.lineCount; index++) {
       const blame = this.getBlameInfoForLine(index);
       if (blame === undefined) {
         continue;
