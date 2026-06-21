@@ -1,5 +1,7 @@
 # Just Blame 🪲
 
+**[Repository moved](https://github.com/sapegin/raccoon-vscode/tree/main/extensions/just-blame)**
+
 Git Blame annotations sidebar, inspired by JetBrains editors.
 
 **Install from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=sapegin.just-blame) or [Open VSX Registry](https://open-vsx.org/extension/sapegin/just-blame)**
